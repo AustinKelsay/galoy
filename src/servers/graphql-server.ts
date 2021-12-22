@@ -38,6 +38,8 @@ import { v4 as uuidv4 } from "uuid"
 
 import { CustomError } from "@core/error"
 
+import { parseIps } from "@domain/users-ips"
+
 import { playgroundTabs } from "../graphql/playground"
 
 import healthzHandler from "./middlewares/healthz"
@@ -66,21 +68,8 @@ export const isEditor = rule({ cache: "contextual" })((parent, args, ctx) => {
 const geeTestConfig = getGeetestConfig()
 const geetest = Geetest(geeTestConfig)
 
-const sessionContext = ({
-  token,
-  ips,
-  body,
-  apiKey,
-  apiSecret,
-}): Promise<GraphQLContext> => {
+const sessionContext = ({ token, ip, body, apiKey, apiSecret }) => {
   const userId = token?.uid ?? null
-  let ip: IpAddress | undefined
-
-  if (ips && Array.isArray(ips) && ips.length) {
-    ip = ips[0] as IpAddress
-  } else if (typeof ips === "string") {
-    ip = ips as IpAddress
-  }
 
   let wallet, user
   // FIXME: type issue with let wallet: LightningUserWallet | null, user: UserRecord | null
@@ -192,10 +181,17 @@ export const startApolloServer = async ({
       // @ts-expect-error: TODO
       const apiSecret = context.req?.apiSecret ?? null
 
-      const ips = context.req?.headers["x-real-ip"]
       const body = context.req?.body ?? null
 
-      return sessionContext({ token, apiKey, apiSecret, ips, body })
+      const ip = parseIps(context.req?.headers)
+
+      return sessionContext({
+        token,
+        apiKey,
+        apiSecret,
+        ip,
+        body,
+      })
     },
     formatError: (err) => {
       const exception = err.extensions?.exception as unknown as CustomError
@@ -328,7 +324,7 @@ export const startApolloServer = async ({
 
               return sessionContext({
                 token,
-                ips: [request?.socket?.remoteAddress],
+                ip: request?.socket?.remoteAddress,
 
                 // TODO: Resolve what's needed here
                 apiKey: null,
