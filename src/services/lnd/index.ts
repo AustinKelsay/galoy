@@ -38,6 +38,7 @@ import { timeout } from "@utils"
 
 import { TIMEOUT_PAYMENT } from "./auth"
 import { getActiveLnd, getLndFromPubkey, getLnds } from "./utils"
+import { baseLogger } from "@services/logger"
 
 export const LndService = (): ILightningService | LightningServiceError => {
   let defaultLnd: AuthenticatedLnd, defaultPubkey: Pubkey
@@ -277,7 +278,7 @@ export const LndService = (): ILightningService | LightningServiceError => {
     }
   }
 
-  const listSettledPayments = async ({
+  const listSettledAndPendingPayments = async ({
     after,
     pubkey,
   }: {
@@ -290,13 +291,39 @@ export const LndService = (): ILightningService | LightningServiceError => {
       const { payments, next } = await getPayments({ lnd, ...pagingArgs })
 
       return {
-        lnPayments: payments
-          .map(translateLnPaymentLookup)
-          .filter((p) => p.status === PaymentStatus.Settled),
+        lnPayments: payments.map(translateLnPaymentLookup),
         endCursor: (next as PagingStartToken) || false,
       }
     } catch (err) {
       return new UnknownLightningServiceError(err)
+    }
+  }
+
+  const listSettledPayments = async (args: {
+    after: PagingStartToken | PagingContinueToken
+    pubkey: Pubkey
+  }): Promise<ListLnPaymentsResult | LightningServiceError> => {
+    const settledAndPendingPayments = await listSettledAndPendingPayments(args)
+    if (settledAndPendingPayments instanceof Error) return settledAndPendingPayments
+
+    const { lnPayments, endCursor } = settledAndPendingPayments
+    return {
+      lnPayments: lnPayments.filter((p) => p.status === PaymentStatus.Settled),
+      endCursor,
+    }
+  }
+
+  const listPendingPayments = async (args: {
+    after: PagingStartToken | PagingContinueToken
+    pubkey: Pubkey
+  }): Promise<ListLnPaymentsResult | LightningServiceError> => {
+    const settledAndPendingPayments = await listSettledAndPendingPayments(args)
+    if (settledAndPendingPayments instanceof Error) return settledAndPendingPayments
+
+    const { lnPayments, endCursor } = settledAndPendingPayments
+    return {
+      lnPayments: lnPayments.filter((p) => p.status !== PaymentStatus.Settled),
+      endCursor,
     }
   }
 
@@ -313,6 +340,32 @@ export const LndService = (): ILightningService | LightningServiceError => {
     return {
       lnPayments: [...settledPayments.lnPayments, ...failedPayments.lnPayments],
       endCursor: settledPayments.endCursor,
+    }
+  }
+
+  const listPayments = async (args: {
+    after: PagingStartToken | PagingContinueToken
+    pubkey: Pubkey
+  }): Promise<ListLnPaymentsResult | LightningServiceError> => {
+    const settledAndPendingPayments = await listSettledAndPendingPayments(args)
+    if (settledAndPendingPayments instanceof Error) return settledAndPendingPayments
+
+    const failedPayments = await listFailedPayments(args)
+    if (failedPayments instanceof Error) return failedPayments
+
+    if (settledAndPendingPayments.endCursor !== failedPayments.endCursor) {
+      baseLogger.warn(
+        {
+          settledAndPendingCursor: settledAndPendingPayments.endCursor,
+          failedCursor: failedPayments.endCursor,
+        },
+        `Returned cursors don't match for 'getPayments' queries`,
+      )
+    }
+
+    return {
+      lnPayments: [...settledAndPendingPayments.lnPayments, ...failedPayments.lnPayments],
+      endCursor: settledAndPendingPayments.endCursor || failedPayments.endCursor,
     }
   }
 
@@ -460,8 +513,11 @@ export const LndService = (): ILightningService | LightningServiceError => {
     lookupInvoice,
     lookupPayment,
     listSettledPayments,
+    listPendingPayments,
     listFailedPayments,
+    listSettledAndPendingPayments,
     listSettledAndFailedPayments,
+    listPayments,
     cancelInvoice,
     payInvoiceViaRoutes,
     payInvoiceViaPaymentDetails,

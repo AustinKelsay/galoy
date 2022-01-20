@@ -181,11 +181,23 @@ interface ILightningService {
     args: ListLnPaymentsArgs,
   ): Promise<ListLnPaymentsResult | LightningServiceError>
 
+  listPendingPayments(
+    args: ListLnPaymentsArgs,
+  ): Promise<ListLnPaymentsResult | LightningServiceError>
+
   listFailedPayments(
     args: ListLnPaymentsArgs,
   ): Promise<ListLnPaymentsResult | LightningServiceError>
 
+  listSettledAndPendingPayments(
+    args: ListLnPaymentsArgs,
+  ): Promise<ListLnPaymentsResult | LightningServiceError>
+
   listSettledAndFailedPayments(
+    args: ListLnPaymentsArgs,
+  ): Promise<ListLnPaymentsResult | LightningServiceError>
+
+  listPayments(
     args: ListLnPaymentsArgs,
   ): Promise<ListLnPaymentsResult | LightningServiceError>
 
