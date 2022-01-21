@@ -1583,10 +1583,10 @@
     "@grpc/proto-loader" "^0.6.4"
     "@types/node" ">=12.12.47"
 
-"@grpc/grpc-js@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.5.1.tgz#934571ae351e868e61d2bd1d56249b79ce8bd1f5"
-  integrity sha512-ItOqQ4ff7JrR9W6KDQm+LdsVjuZtV7Qq64Oy3Hjx8ZPBDDwBx7rD8hOL0Vnde0RbnsqLG86WOgF+tQDzf/nSzQ==
+"@grpc/grpc-js@1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.5.3.tgz#fe78a40eab4e21a6044ff6f23798f712ea352a8f"
+  integrity sha512-q0xgaZ3ymUM+ZOhe1hdocVSdKHCnJ6llLSXcP+MqMXMyYPUZ3mzQOCxZ3Zkg+QZ7sZ950sn7hvueQrIJZumPZg==
   dependencies:
     "@grpc/proto-loader" "^0.6.4"
     "@types/node" ">=12.12.47"
@@ -2605,10 +2605,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.12.tgz#ac7fb693ac587ee182c3780c26eb65546a1a3c10"
   integrity sha512-+2Iggwg7PxoO5Kyhvsq9VarmPbIelXP070HMImEpbtGCoyWNINQj4wzjbQCXzdHTRXnqufutJb5KAURZANNBAw==
 
-"@types/node@17.0.8":
-  version "17.0.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.8.tgz#50d680c8a8a78fe30abe6906453b21ad8ab0ad7b"
-  integrity sha512-YofkM6fGv4gDJq78g4j0mMuGMkZVxZDgtU0JRdx6FgiJDG+0fY0GKVolOV8WqVmEhLCXkQRjwDdKyPxJp/uucg==
+"@types/node@17.0.10":
+  version "17.0.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.10.tgz#616f16e9d3a2a3d618136b1be244315d95bd7cab"
+  integrity sha512-S/3xB4KzyFxYGCppyDt68yzBU9ysL88lSdIah4D6cptdcltc4NCPCAMc0+PCpg/lLIyC7IPvj2Z52OJWeIUkog==
 
 "@types/node@^10.0.3", "@types/node@^10.1.0":
   version "10.17.60"
@@ -8642,15 +8642,15 @@ lightning@5.2.1:
     psbt "1.1.10"
     type-fest "2.8.0"
 
-lightning@^5.3.2:
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/lightning/-/lightning-5.3.2.tgz#0ff88eb2720308e1581056d3674e685d9018cdc9"
-  integrity sha512-8TB+p2ovgo0h+kA7v4G6ljm/LUiLWRVf1+HyG0iPgDnU+o1psoNar+h6dNAQsZSQopZ25k8zrIseA2vapRuWiQ==
+lightning@^5.3.4:
+  version "5.3.4"
+  resolved "https://registry.yarnpkg.com/lightning/-/lightning-5.3.4.tgz#6de0c1dde522fb8dcf41c8efa62954b7c8b2251e"
+  integrity sha512-zUHlFFSS+KJhndoZkjkXPWpvlXAgYGWS2SxzXpiiwnXZKCNmT+IkQFQmp2oIpbF7K93oqlpxgafZMZDeReX5pQ==
   dependencies:
-    "@grpc/grpc-js" "1.5.1"
+    "@grpc/grpc-js" "1.5.3"
     "@grpc/proto-loader" "0.6.9"
     "@types/express" "4.17.13"
-    "@types/node" "17.0.8"
+    "@types/node" "17.0.10"
     "@types/request" "2.48.8"
     "@types/ws" "8.2.2"
     async "3.2.3"
@@ -8664,7 +8664,7 @@ lightning@^5.3.2:
     express "4.17.2"
     invoices "2.0.3"
     psbt "1.1.10"
-    type-fest "2.9.0"
+    type-fest "2.10.0"
 
 limiter@^1.1.5:
   version "1.1.5"
@@ -12376,15 +12376,15 @@ type-detect@4.0.8:
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
   integrity sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==
 
+type-fest@2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.10.0.tgz#0ee9c3cd411efb3bba434065d32235592d3644cf"
+  integrity sha512-u2yreDMllFI3VCpWt0rKrGs/E2LO0YHBwiiOIj+ilQh9+ALMaa4lNBSdoDvuHN3cbKcYk9L1BXP49x9RT+o/SA==
+
 type-fest@2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.8.0.tgz#39d7c9f9c508df8d6ce1cf5a966b0e6568dcc50d"
   integrity sha512-O+V9pAshf9C6loGaH0idwsmugI2LxVNR7DtS40gVo2EXZVYFgz9OuNtOhgHLdHdapOEWNdvz9Ob/eeuaWwwlxA==
-
-type-fest@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.9.0.tgz#7a2d430dd966f52b6bc723da2aaa2c9867530551"
-  integrity sha512-uC0hJKi7eAGXUJ/YKk53RhnKxMwzHWgzf4t92oz8Qez28EBgVTfpDTB59y9hMYLzc/Wl85cD7Tv1hLZZoEJtrg==
 
 type-fest@^0.20.2:
   version "0.20.2"
