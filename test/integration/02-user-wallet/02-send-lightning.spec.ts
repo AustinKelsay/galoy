@@ -1,5 +1,7 @@
 import { createHash, randomBytes } from "crypto"
 
+import { authenticatedLndGrpc, getNetworkInfo } from "lightning"
+
 import { Wallets } from "@app"
 import { getUserLimits } from "@config"
 import { FEECAP_PERCENT, toSats } from "@domain/bitcoin"
@@ -50,6 +52,7 @@ import {
   getAccountIdByTestUserIndex,
 } from "test/helpers"
 import { getBTCBalance, getRemainingTwoFALimit } from "test/helpers/wallet"
+import { partialMigrateLnPaymentsFromLnd } from "@app/lightning/migrate-ln-payments"
 
 const date = Date.now() + 1000 * 60 * 60 * 24 * 8
 // required to avoid withdrawal limits validation
@@ -115,6 +118,35 @@ afterAll(() => {
 })
 
 describe("UserWallet - Lightning Pay", () => {
+  it.only("test with mainnet", async () => {
+    const getLnd = () => {
+      try {
+        const { lnd } = authenticatedLndGrpc({
+          cert: process.env.LND1_TLS,
+          macaroon: process.env.LND1_MACAROON,
+          socket: "34.68.18.9:10009",
+        })
+        return lnd
+      } catch (err) {
+        console.log({ err })
+        return null
+      }
+    }
+    const lnd = getLnd()
+    if (!lnd) return
+
+    const lndService = LndService(lnd)
+    if (lndService instanceof Error) {
+      console.log("HERE 0:", lndService)
+      return lndService
+    }
+
+    const result = await partialMigrateLnPaymentsFromLnd(lndService)
+    console.log("HERE FIN:", result)
+    // const result = await getNetworkInfo({ lnd })
+    // console.log(result)
+  })
+
   it("sends to another Galoy user with memo", async () => {
     const memo = "invoiceMemo"
 

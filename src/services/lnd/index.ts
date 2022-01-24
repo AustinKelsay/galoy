@@ -30,27 +30,37 @@ import {
   GetInvoiceResult,
   getPayments,
   getFailedPayments,
+  getWalletInfo,
 } from "lightning"
 
 import { LndOfflineError } from "@core/error"
 
 import { timeout } from "@utils"
+import { baseLogger } from "@services/logger"
 
 import { TIMEOUT_PAYMENT } from "./auth"
 import { getActiveLnd, getLndFromPubkey, getLnds } from "./utils"
-import { baseLogger } from "@services/logger"
+import { assert } from "console"
 
-export const LndService = (): ILightningService | LightningServiceError => {
+export const LndService = (
+  lnd?: AuthenticatedLnd,
+): ILightningService | LightningServiceError => {
   let defaultLnd: AuthenticatedLnd, defaultPubkey: Pubkey
-  try {
-    const { lnd, pubkey } = getActiveLnd()
+  if (lnd) {
     defaultLnd = lnd
-    defaultPubkey = pubkey as Pubkey
-  } catch (err) {
-    const errDetails = parseLndErrorDetails(err)
-    switch (errDetails) {
-      default:
-        return new UnknownLightningServiceError(err)
+    defaultPubkey =
+      "0325bb9bda523a85dc834b190289b7e25e8d92615ab2f2abffbe97983f0bb12ffb" as Pubkey
+  } else {
+    try {
+      const { lnd, pubkey } = getActiveLnd()
+      defaultLnd = lnd
+      defaultPubkey = pubkey as Pubkey
+    } catch (err) {
+      const errDetails = parseLndErrorDetails(err)
+      switch (errDetails) {
+        default:
+          return new UnknownLightningServiceError(err)
+      }
     }
   }
 
@@ -262,7 +272,9 @@ export const LndService = (): ILightningService | LightningServiceError => {
     after: PagingStartToken | PagingContinueToken
     pubkey: Pubkey
   }): Promise<ListLnPaymentsResult | LightningServiceError> => {
-    const { lnd } = getLndFromPubkey({ pubkey })
+    // const { lnd } = getLndFromPubkey({ pubkey })
+    assert(pubkey)
+    const lnd = defaultLnd
     const pagingArgs = after ? { token: after } : {}
 
     try {
@@ -286,15 +298,19 @@ export const LndService = (): ILightningService | LightningServiceError => {
     pubkey: Pubkey
   }): Promise<ListLnPaymentsResult | LightningServiceError> => {
     try {
-      const { lnd } = getLndFromPubkey({ pubkey })
+      // const { lnd } = getLndFromPubkey({ pubkey })
+      assert(pubkey)
+      const lnd = defaultLnd
       const pagingArgs = after ? { token: after } : {}
       const { payments, next } = await getPayments({ lnd, ...pagingArgs })
-
+      console.log("HERE 30:", payments[0])
       return {
         lnPayments: payments.map(translateLnPaymentLookup),
         endCursor: (next as PagingStartToken) || false,
       }
     } catch (err) {
+      console.log("HERE 20:", err)
+      console.log("HERE 21:", parseLndErrorDetails(err))
       return new UnknownLightningServiceError(err)
     }
   }
