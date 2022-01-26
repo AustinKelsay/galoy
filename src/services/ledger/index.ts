@@ -169,6 +169,38 @@ export const LedgerService = (): ILedgerService => {
     }
   }
 
+  async function* listPaymentHashes(): AsyncGenerator<PaymentHash | LedgerError> {
+    const aggregationParams = [
+      {
+        $match: {
+          type: LedgerTransactionType.Payment,
+        },
+      },
+      {
+        $group: {
+          _id: "$hash",
+          createdAt: { $first: "$timestamp" },
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ]
+
+    try {
+      const agg = Transaction.aggregate(aggregationParams)
+        .cursor({ batchSize: 100 })
+        .exec()
+      for await (const { _id } of agg) {
+        yield _id
+      }
+    } catch (err) {
+      yield new UnknownLedgerError(err)
+    }
+  }
+
   const getPendingPaymentsCount = async (
     walletId: WalletId,
   ): Promise<number | LedgerError> => {
@@ -873,6 +905,7 @@ export const LedgerService = (): ILedgerService => {
     listPendingPayments,
     createListPaymentHashesGenerator,
     nextPayment,
+    listPaymentHashes,
     getPendingPaymentsCount,
     getWalletBalance,
     allPaymentVolumeSince,

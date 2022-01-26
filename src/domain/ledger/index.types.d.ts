@@ -194,6 +194,8 @@ interface ILedgerService {
     generator: AggregationCursor<{ _id: PaymentHash }>,
   ): Promise<PaymentHash | undefined | LedgerServiceError>
 
+  listPaymentHashes(): AsyncGenerator<PaymentHash | LedgerError>
+
   getPendingPaymentsCount(walletId: WalletId): Promise<number | LedgerServiceError>
 
   getWalletBalance(walletId: WalletId): Promise<Satoshis | LedgerServiceError>
