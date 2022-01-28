@@ -62,6 +62,7 @@ type SendIntraledgerTxArgs = IntraledgerTxArgs & {
 
 type LoadLedgerParams = {
   bankOwnerWalletResolver: () => Promise<WalletId>
-  dealerWalletResolver: () => Promise<WalletId>
+  dealerBtcWalletResolver: () => Promise<WalletId>
+  dealerUsdWalletResolver: () => Promise<WalletId>
   funderWalletResolver: () => Promise<WalletId>
 }

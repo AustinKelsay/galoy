@@ -39,11 +39,13 @@ import {
 
 export const loadLedger = ({
   bankOwnerWalletResolver,
-  dealerWalletResolver,
+  dealerBtcWalletResolver,
+  dealerUsdWalletResolver,
   funderWalletResolver,
 }: LoadLedgerParams) => {
   accounts.setBankOwnerWalletResolver(bankOwnerWalletResolver)
-  accounts.setDealerWalletResolver(dealerWalletResolver)
+  accounts.setDealerBtcWalletResolver(dealerBtcWalletResolver)
+  accounts.setDealerUsdWalletResolver(dealerUsdWalletResolver)
   accounts.setFunderWalletResolver(funderWalletResolver)
   return {
     ...accounts,

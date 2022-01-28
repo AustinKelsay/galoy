@@ -3,7 +3,8 @@ import { balanceSheetIsBalanced, getLedgerAccounts } from "@core/balance-sheet"
 import { toSats } from "@domain/bitcoin"
 import {
   getBankOwnerWalletId,
-  getDealerWalletId,
+  getDealerBtcWalletId,
+  getDealerUsdWalletId,
   getFunderWalletId,
 } from "@services/ledger/accounts"
 import { LedgerService } from "@services/ledger"
@@ -73,16 +74,19 @@ const business_g = new client.Gauge({
   help: "number of businesses in the app",
 })
 
-const roles = ["dealer", "funder", "bankowner"]
-const accountRoles = [getDealerWalletId, getFunderWalletId, getBankOwnerWalletId]
-const walletRoles = {}
-
-for (const role of roles) {
-  walletRoles[role] = new client.Gauge({
-    name: `${prefix}_${role}_balance`,
-    help: "funder balance BTC",
-  })
-}
+const walletsInit = [
+  { name: "dealer_btc", getId: getDealerBtcWalletId },
+  { name: "dealer_usd", getId: getDealerUsdWalletId },
+  { name: "funder", getId: getFunderWalletId },
+  { name: "bankowner", getId: getBankOwnerWalletId },
+]
+const wallets = walletsInit.map((wallet) => ({
+  gauge: new client.Gauge({
+    name: `${prefix}_${wallet.name}_balance`,
+    help: `${wallet.name}`,
+  }),
+  ...wallet,
+}))
 
 const main = async () => {
   server.get("/metrics", async (req, res) => {
@@ -114,21 +118,20 @@ const main = async () => {
     const userCount = await User.countDocuments()
     userCount_g.set(userCount)
 
-    for (const index in roles) {
-      const role = roles[index]
-      const walletId = await accountRoles[index]()
+    for (const wallet of wallets) {
+      const walletId = await wallet.getId()
 
       let balance: Satoshis
 
       const balanceSats = await LedgerService().getWalletBalance(walletId)
       if (balanceSats instanceof Error) {
-        baseLogger.warn({ walletId, role, balanceSats }, "impossible to get balance")
+        baseLogger.warn({ walletId, balanceSats }, "impossible to get balance")
         balance = toSats(0)
       } else {
         balance = balanceSats
       }
 
-      walletRoles[role].set(balance)
+      wallet.gauge.set(balance)
     }
 
     business_g.set(await User.count({ title: { $ne: null } }))
