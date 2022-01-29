@@ -366,6 +366,7 @@ export const LndService = (): ILightningService | LightningServiceError => {
       ])) as PayViaRoutesResult
       return {
         roundedUpFee: toSats(paymentResult.safe_fee),
+        revealedPreImage: paymentResult.secret as RevealedPreImage,
         sentFromPubkey: pubkey,
       }
     } catch (err) {
@@ -433,6 +434,7 @@ export const LndService = (): ILightningService | LightningServiceError => {
       ])) as PayViaPaymentDetailsResult
       return {
         roundedUpFee: toSats(paymentResult.safe_fee),
+        revealedPreImage: paymentResult.secret as RevealedPreImage,
         sentFromPubkey: defaultPubkey,
       }
     } catch (err) {
