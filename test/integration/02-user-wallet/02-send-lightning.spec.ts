@@ -16,7 +16,7 @@ import {
 } from "@domain/errors"
 import { TwoFAError } from "@domain/twoFA"
 import { PaymentInitiationMethod } from "@domain/wallets"
-import { LedgerService } from "@services/ledger"
+import { bookLedgerQuery, LedgerService } from "@services/ledger"
 import { getActiveLnd, getInvoiceAttempt } from "@services/lnd/utils"
 import { baseLogger } from "@services/logger"
 import { LnPaymentsRepository, WalletInvoicesRepository } from "@services/mongoose"
@@ -27,6 +27,8 @@ import { sleep } from "@utils"
 
 import { updateLnPayments } from "@app/lightning"
 import { delete2fa } from "@app/users"
+
+import { MainBook } from "@services/ledger/books"
 
 import {
   cancelHodlInvoice,
@@ -115,6 +117,33 @@ afterAll(() => {
 })
 
 describe("UserWallet - Lightning Pay", () => {
+  it.skip("custom test", async () => {
+    try {
+      console.log("HERE 0:")
+      const response = await MainBook.ledger({
+        account_path: "Liabilities",
+        hash: "6fab45e3f2e1a2f208c763a3d1c14a81bacb8b2af494c3bb9ce33dd10328fdcc",
+      })
+      const { results } = response
+      console.log("HERE 0:", response)
+      console.log("HERE 1:", results)
+    } catch (err) {
+      return err
+    }
+  })
+
+  it.skip("custom test", async () => {
+    // const paymentHash =
+    //   "6fab45e3f2e1a2f208c763a3d1c14a81bacb8b2af494c3bb9ce33dd10328fdcc" as PaymentHash
+    const username = "user1"
+    // const accountPath = "Liabilities"
+    const account = "Liabilities:52fbd4b7-7c5c-422e-90a8-df3bd99bf1f9a"
+
+    const { results } = await bookLedgerQuery({ username, account })
+    console.log("HERE 1:", results)
+    // console.log("HERE 2:", results[0].lnPayments.confirmedDetails)
+  })
+
   it("sends to another Galoy user with memo", async () => {
     const memo = "invoiceMemo"
 

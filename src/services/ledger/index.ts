@@ -890,7 +890,7 @@ const translateToLedgerJournal = (savedEntry): LedgerJournal => ({
   transactionIds: savedEntry._transactions.map((id) => id.toString()),
 })
 
-const bookLedgerQuery = async (args) => {
+export const bookLedgerQuery = async (args) => {
   const { account, accountPath, ...keysToMatch } = args
   const accountMatch = accountPath
     ? { $expr: { $in: [accountPath, "$account_path"] } }
