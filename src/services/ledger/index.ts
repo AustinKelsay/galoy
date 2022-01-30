@@ -57,7 +57,7 @@ export const LedgerService = (): ILedgerService => {
     id: LedgerTransactionId,
   ): Promise<LedgerTransaction | LedgerServiceError> => {
     try {
-      const { results } = await MainBook.ledger({
+      const { results } = await bookLedgerQuery({
         account_path: liabilitiesMainAccount,
         _id: id,
       })
@@ -74,7 +74,7 @@ export const LedgerService = (): ILedgerService => {
     hash: PaymentHash | OnChainTxHash,
   ): Promise<LedgerTransaction[] | LedgerServiceError> => {
     try {
-      const { results } = await MainBook.ledger({
+      const { results } = await bookLedgerQuery({
         account_path: liabilitiesMainAccount,
         hash,
       })
@@ -89,7 +89,7 @@ export const LedgerService = (): ILedgerService => {
   ): Promise<LedgerTransaction[] | LedgerError> => {
     const liabilitiesWalletId = toLiabilitiesWalletId(walletId)
     try {
-      const { results } = await MainBook.ledger({ account: liabilitiesWalletId })
+      const { results } = await bookLedgerQuery({ account: liabilitiesWalletId })
       return results.map((tx) => translateToLedgerTx(tx))
     } catch (err) {
       return new UnknownLedgerError(err)
@@ -102,7 +102,7 @@ export const LedgerService = (): ILedgerService => {
   ): Promise<LedgerTransaction[] | LedgerError> => {
     const liabilitiesWalletId = toLiabilitiesWalletId(walletId)
     try {
-      const { results } = await MainBook.ledger({
+      const { results } = await bookLedgerQuery({
         account: liabilitiesWalletId,
         username: contactUsername,
       })
@@ -117,7 +117,7 @@ export const LedgerService = (): ILedgerService => {
   ): Promise<LedgerTransaction[] | LedgerError> => {
     const liabilitiesWalletId = toLiabilitiesWalletId(walletId)
     try {
-      const { results } = await MainBook.ledger({
+      const { results } = await bookLedgerQuery({
         account: liabilitiesWalletId,
         type: LedgerTransactionType.Payment,
         pending: true,
@@ -301,7 +301,7 @@ export const LedgerService = (): ILedgerService => {
     paymentHash: PaymentHash,
   ): Promise<boolean | LedgerServiceError> => {
     try {
-      const { total } = await MainBook.ledger({
+      const { total } = await bookLedgerQuery({
         pending: false,
         hash: paymentHash,
       })
@@ -888,3 +888,22 @@ const translateToLedgerJournal = (savedEntry): LedgerJournal => ({
   voided: savedEntry.voided,
   transactionIds: savedEntry._transactions.map((id) => id.toString()),
 })
+
+const bookLedgerQuery = async (args) => {
+  const { account, accountPath, ...keysToMatch } = args
+  const accountMatch = accountPath
+    ? { $expr: { $in: [accountPath, "$account_path"] } }
+    : account
+    ? { accounts: account }
+    : {}
+
+  try {
+    const results = await Transaction.aggregate([
+      { $match: { ...keysToMatch, ...accountMatch } },
+      { $sort: { datetime: -1, timestamp: -1 } },
+    ])
+    return { results, total: results.length }
+  } catch (err) {
+    return err
+  }
+}
