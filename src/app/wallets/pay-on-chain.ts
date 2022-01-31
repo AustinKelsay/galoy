@@ -336,6 +336,7 @@ const executePaymentViaOnChain = async ({
 
         return ledgerService.addOnChainTxSend({
           walletId: senderWallet.id,
+          walletCurrency: senderWallet.currency,
           txHash,
           description: memo || "",
           sats,

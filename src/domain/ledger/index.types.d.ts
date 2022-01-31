@@ -55,16 +55,18 @@ type LedgerTransaction = {
 
 type ReceiveOnChainTxArgs = {
   walletId: WalletId
+  walletCurrency: WalletCurrency
   txHash: OnChainTxHash
   sats: Satoshis
   fee: Satoshis
-  usd: number
-  usdFee: number
+  amountDisplayCurrency: DisplayCurrencyBaseAmount
+  feeDisplayCurrency: DisplayCurrencyBaseAmount
   receivingAddress: OnChainAddress
 }
 
 type TxArgs = {
   walletId: WalletId
+  walletCurrency: WalletCurrency
   description: string
   sats: Satoshis
   amountDisplayCurrency: DisplayCurrencyBaseAmount
@@ -80,7 +82,6 @@ type OnChainTxArgs = TxArgs & {
 }
 
 type AddLnTxReceiveArgs = LnTxArgs & {
-  currency: WalletCurrency
   usd: UsdCents | undefined
   feeInboundLiquidityDisplayCurrency: DisplayCurrencyBaseAmount
   feeInboundLiquidity: Satoshis
@@ -136,6 +137,15 @@ type AddIntraLedgerTxSendArgs = IntraledgerTxArgs & {
   amountDisplayCurrency: DisplayCurrencyBaseAmount
 }
 
+type SendIntraledgerTxArgs = IntraledgerTxArgs & {
+  recipientUsername: Username | null
+  shareMemoWithPayee: boolean
+  metadata:
+    | AddLnIntraledgerSendLedgerMetadata
+    | AddOnChainIntraledgerSendLedgerMetadata
+    | AddWalletIdIntraledgerSendLedgerMetadata
+}
+
 type AddLnIntraledgerTxSendArgs = AddIntraLedgerTxSendArgs & {
   paymentHash: PaymentHash
   pubkey: Pubkey
@@ -146,18 +156,19 @@ type AddOnChainIntraledgerTxSendArgs = AddIntraLedgerTxSendArgs & {
   sendAll: boolean
 }
 
-type addWalletIdIntraledgerTxSendArgs = AddIntraLedgerTxSendArgs
+type AddWalletIdIntraledgerTxSendArgs = AddIntraLedgerTxSendArgs
 
 type AddLnFeeReeimbursementReceiveArgs = {
   walletId: WalletId
+  walletCurrency: WalletCurrency
   paymentHash: PaymentHash
   sats: Satoshis
-  usd: number
+  amountDisplayCurrency: DisplayCurrencyBaseAmount
   journalId: LedgerJournalId
 }
 
 type FeeReimbursement = {
-  getReimbursement({ actualFee }: { actualFee: Satoshis }): Satoshis | FeeDifferenceError
+  getReimbursement(actualFee: Satoshis): Satoshis | FeeDifferenceError
 }
 
 type TxVolume = {

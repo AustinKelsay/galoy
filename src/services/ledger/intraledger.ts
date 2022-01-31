@@ -24,7 +24,7 @@ export const intraledger = {
     recipientUsername,
     memoPayer,
   }: AddOnChainIntraledgerTxSendArgs): Promise<LedgerJournal | LedgerError> => {
-    const metadata: AddOnChainIntraledgerTxSendMetadata = {
+    const metadata: AddOnChainIntraledgerSendLedgerMetadata = {
       type: LedgerTransactionType.OnchainIntraLedger,
       pending: false,
       usd: amountDisplayCurrency,
@@ -60,8 +60,8 @@ export const intraledger = {
     recipientWalletCurrency,
     recipientUsername,
     memoPayer,
-  }: addWalletIdIntraledgerTxSendArgs): Promise<LedgerJournal | LedgerError> => {
-    const metadata: AddWalletIdIntraledgerTxSendMetadata = {
+  }: AddWalletIdIntraledgerTxSendArgs): Promise<LedgerJournal | LedgerError> => {
+    const metadata: AddWalletIdIntraledgerSendLedgerMetadata = {
       type: LedgerTransactionType.IntraLedger,
       pending: false,
       usd: amountDisplayCurrency,
@@ -98,7 +98,7 @@ export const intraledger = {
     recipientUsername,
     memoPayer,
   }: AddLnIntraledgerTxSendArgs): Promise<LedgerJournal | LedgerError> => {
-    const metadata: AddLnIntraledgerTxSendMetadata = {
+    const metadata: AddLnIntraledgerSendLedgerMetadata = {
       type: LedgerTransactionType.IntraLedger,
       pending: false,
       hash: paymentHash,
